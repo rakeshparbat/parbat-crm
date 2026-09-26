@@ -149,6 +149,15 @@ export async function GET(request: Request) {
       )
     }
 
+    // Fast-path: Check environment variable fallback first (e.g. WHATSAPP_VERIFY_TOKEN)
+    const envVerifyToken = process.env.WHATSAPP_VERIFY_TOKEN
+    if (envVerifyToken && envVerifyToken === verifyToken) {
+      return new Response(challenge, {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain' },
+      })
+    }
+
     // Fetch all whatsapp configs to check verify tokens
     const { data: configs, error: configError } = await supabaseAdmin()
       .from('whatsapp_config')
