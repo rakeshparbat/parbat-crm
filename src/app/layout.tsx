@@ -63,7 +63,7 @@ const THEME_BOOT_SCRIPT = `
     var THEME_DEFAULT = ${JSON.stringify(DEFAULT_THEME)};
     var THEMES = ${JSON.stringify(THEME_IDS)};
     var savedTheme = localStorage.getItem(THEME_KEY);
-    if (!savedTheme || savedTheme === "violet") {
+    if (!savedTheme || savedTheme === "violet" || savedTheme === "whatsapp") {
       savedTheme = THEME_DEFAULT;
       try { localStorage.setItem(THEME_KEY, THEME_DEFAULT); } catch(_e){}
     }

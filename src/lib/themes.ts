@@ -14,6 +14,7 @@
  */
 
 export const THEME_IDS = [
+  "kommo",
   "whatsapp",
   "violet",
   "emerald",
@@ -24,7 +25,7 @@ export const THEME_IDS = [
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
-export const DEFAULT_THEME: ThemeId = "whatsapp";
+export const DEFAULT_THEME: ThemeId = "kommo";
 
 export const STORAGE_KEY = "wacrm.theme";
 
@@ -68,6 +69,12 @@ export interface ThemeMeta {
 }
 
 export const THEMES: ReadonlyArray<ThemeMeta> = [
+  {
+    id: "kommo",
+    name: "Kommo Blue",
+    tagline: "Kommo signature cobalt (#2962FF) with WhatsApp messaging accents.",
+    swatch: "#2962FF",
+  },
   {
     id: "whatsapp",
     name: "WhatsApp Green",

@@ -11,14 +11,14 @@
  */
 
 /** App-wide fallback when no account/deal currency is available. */
-export const DEFAULT_CURRENCY = "USD";
+export const DEFAULT_CURRENCY = "INR";
 
 export interface CurrencyOption {
-  /** ISO-4217 code, e.g. "USD". Stored verbatim in the DB. */
+  /** ISO-4217 code, e.g. "INR". Stored verbatim in the DB. */
   code: string;
-  /** Human label for the dropdown, e.g. "US Dollar". */
+  /** Human label for the dropdown, e.g. "Indian Rupee". */
   label: string;
-  /** Symbol for compact display, e.g. "$". */
+  /** Symbol for compact display, e.g. "₹". */
   symbol: string;
 }
 
@@ -28,10 +28,10 @@ export interface CurrencyOption {
  * list to offer more — nothing else needs to change.
  */
 export const CURRENCIES: CurrencyOption[] = [
+  { code: "INR", label: "Indian Rupee", symbol: "₹" },
   { code: "USD", label: "US Dollar", symbol: "$" },
   { code: "EUR", label: "Euro", symbol: "€" },
   { code: "GBP", label: "British Pound", symbol: "£" },
-  { code: "INR", label: "Indian Rupee", symbol: "₹" },
   { code: "AUD", label: "Australian Dollar", symbol: "A$" },
   { code: "CAD", label: "Canadian Dollar", symbol: "C$" },
   { code: "BRL", label: "Brazilian Real", symbol: "R$" },
@@ -64,8 +64,9 @@ export function formatCurrency(
 ): string {
   const code = (currency || DEFAULT_CURRENCY).trim();
   const amount = Number(value) || 0;
+  const locale = code === "INR" ? "en-IN" : undefined;
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: code,
       minimumFractionDigits: 0,
@@ -82,7 +83,7 @@ export function formatCurrency(
 
 /**
  * Compact currency for tight spaces (donut center, legend rows):
- * "$1.2M" / "€34.5k" / "₹900". Uses the currency's symbol from
+ * "$1.2M" / "€34.5k" / "₹1.0 Cr" / "₹900". Uses the currency's symbol from
  * CURRENCIES, falling back to the code when we don't carry a symbol.
  */
 export function formatCurrencyShort(
@@ -91,6 +92,13 @@ export function formatCurrencyShort(
 ): string {
   const code = currency || DEFAULT_CURRENCY;
   const symbol = CURRENCIES.find((c) => c.code === code)?.symbol ?? `${code} `;
+  if (code === "INR") {
+    const v = Number(value || 0);
+    if (v >= 10_000_000) return `${symbol}${(v / 10_000_000).toFixed(1)} Cr`;
+    if (v >= 100_000) return `${symbol}${(v / 100_000).toFixed(1)} L`;
+    if (v >= 1_000) return `${symbol}${(v / 1_000).toFixed(1)}k`;
+    return `${symbol}${v.toFixed(0)}`;
+  }
   return `${symbol}${formatCompactNumber(value)}`;
 }
 
