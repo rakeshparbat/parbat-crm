@@ -69,20 +69,20 @@ function LoginPageInner() {
 
   return (
     <div className="relative min-h-screen w-full grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-background">
-      {/* LEFT: Kommo-Style Full-Page Showcase Panel (Desktop) */}
-      <div className="relative hidden lg:flex lg:col-span-7 flex-col justify-between overflow-hidden bg-gradient-to-br from-[#090E17] via-[#0E1726] to-[#070B12] p-8 lg:p-12 xl:p-16 text-white border-r border-border/40">
+      {/* LEFT: Kommo-Style Full-Page Dark Showcase Panel (Desktop) */}
+      <div className="relative hidden lg:flex lg:col-span-7 flex-col justify-between overflow-hidden bg-gradient-to-br from-[#060A14] via-[#0B1224] to-[#040810] p-8 lg:p-12 xl:p-16 text-white border-r border-slate-800/80">
         {/* Ambient atmospheric glows */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-20 -top-20 h-96 w-96 rounded-full bg-primary/20 blur-[100px]"
+          className="pointer-events-none absolute -left-20 -top-20 h-[480px] w-[480px] rounded-full bg-primary/25 blur-[120px]"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 right-10 h-96 w-96 rounded-full bg-emerald-500/15 blur-[100px]"
+          className="pointer-events-none absolute bottom-0 right-10 h-[450px] w-[450px] rounded-full bg-emerald-500/20 blur-[120px]"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-1/3 h-64 w-64 -translate-y-1/2 rounded-full bg-primary/10 blur-[80px]"
+          className="pointer-events-none absolute top-1/2 left-1/3 h-72 w-72 -translate-y-1/2 rounded-full bg-blue-600/15 blur-[90px]"
         />
 
         {/* Top Header */}
@@ -122,8 +122,8 @@ function LoginPageInner() {
           </div>
         </div>
 
-        {/* Simulated WhatsApp Lead & Live Chat Card (Indian Lead & ₹ Currency) */}
-        <div className="relative z-10 my-8 max-w-xl space-y-3.5 rounded-3xl border border-slate-700/60 bg-slate-900/85 p-5 shadow-2xl backdrop-blur-xl">
+        {/* Simulated WhatsApp Lead & Live Chat Card (Indian Lead & ₹1 Cr Currency) */}
+        <div className="relative z-10 my-8 max-w-xl space-y-3.5 rounded-3xl border border-slate-700/70 bg-slate-900/90 p-5 shadow-2xl backdrop-blur-xl">
           {/* Header inside mock */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-3.5">
             <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ function LoginPageInner() {
 
           {/* Incoming message from customer */}
           <div className="flex flex-col items-start gap-1">
-            <div className="max-w-[88%] rounded-2xl rounded-tl-sm bg-slate-800/90 px-4 py-2.5 text-xs sm:text-sm text-slate-100 shadow-sm leading-relaxed">
+            <div className="max-w-[88%] rounded-2xl rounded-tl-sm bg-slate-800/95 px-4 py-2.5 text-xs sm:text-sm text-slate-100 shadow-sm leading-relaxed">
               Namaste! We want to integrate WhatsApp CRM for our enterprise sales team in Mumbai. Our deal pipeline estimate is ₹1 Crore. Can we schedule an onboarding session?
             </div>
             <span className="flex items-center gap-1 text-[10px] text-slate-500 pl-1">
@@ -183,7 +183,7 @@ function LoginPageInner() {
         {/* Feature Highlights Footer - Prominent Large Stat Cards */}
         <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3.5 xl:gap-5 border-t border-slate-800/80 pt-6">
           {/* Card 1: 2.4x Faster */}
-          <div className="flex flex-col gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/75 p-4 xl:p-5 backdrop-blur-md shadow-lg transition-transform hover:-translate-y-0.5">
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-700/70 bg-slate-900/80 p-4 xl:p-5 backdrop-blur-md shadow-xl transition-transform hover:-translate-y-0.5">
             <div className="flex h-11 w-11 xl:h-12 xl:w-12 items-center justify-center rounded-xl bg-primary/20 text-primary shadow-md shadow-primary/20">
               <Zap className="h-6 w-6" />
             </div>
@@ -194,7 +194,7 @@ function LoginPageInner() {
           </div>
 
           {/* Card 2: 24/7 Smart Bot */}
-          <div className="flex flex-col gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/75 p-4 xl:p-5 backdrop-blur-md shadow-lg transition-transform hover:-translate-y-0.5">
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-700/70 bg-slate-900/80 p-4 xl:p-5 backdrop-blur-md shadow-xl transition-transform hover:-translate-y-0.5">
             <div className="flex h-11 w-11 xl:h-12 xl:w-12 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 shadow-md shadow-emerald-500/20">
               <Sparkles className="h-6 w-6" />
             </div>
@@ -205,7 +205,7 @@ function LoginPageInner() {
           </div>
 
           {/* Card 3: Meta Cloud API */}
-          <div className="flex flex-col gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/75 p-4 xl:p-5 backdrop-blur-md shadow-lg transition-transform hover:-translate-y-0.5">
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-700/70 bg-slate-900/80 p-4 xl:p-5 backdrop-blur-md shadow-xl transition-transform hover:-translate-y-0.5">
             <div className="flex h-11 w-11 xl:h-12 xl:w-12 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 shadow-md shadow-blue-500/20">
               <ShieldCheck className="h-6 w-6" />
             </div>
@@ -217,62 +217,47 @@ function LoginPageInner() {
         </div>
       </div>
 
-      {/* RIGHT: Login Form (Full-Page Half on Desktop) */}
-      <div className="flex flex-col justify-between lg:col-span-5 min-h-screen p-6 sm:p-10 lg:p-12 xl:p-16 bg-card/95 lg:bg-background/90 backdrop-blur-xl">
+      {/* RIGHT: Login Form (High-Contrast Crisp White Panel) */}
+      <div className="flex flex-col justify-between lg:col-span-5 min-h-screen p-6 sm:p-10 lg:p-12 xl:p-16 bg-white border-l border-slate-200/90 shadow-[-10px_0_30px_rgba(0,0,0,0.03)]">
         {/* Mobile Header (visible only on mobile/tablet) */}
-        <div className="flex items-center justify-between lg:hidden mb-6 pb-4 border-b border-border/50">
+        <div className="flex items-center justify-between lg:hidden mb-6 pb-4 border-b border-slate-200">
           <div className="flex flex-col">
             <Image
               src="/parbat-logo.png"
               alt="Parbat Logo"
               width={130}
               height={28}
-              className="h-7 w-auto object-contain dark:hidden"
+              className="h-7 w-auto object-contain"
             />
-            <Image
-              src="/parbat-logo-white.png"
-              alt="Parbat Logo"
-              width={130}
-              height={28}
-              className="h-7 w-auto object-contain hidden dark:block"
-            />
-            <p className="text-[10px] font-semibold text-muted-foreground mt-0.5">
+            <p className="text-[10px] font-semibold text-slate-500 mt-0.5">
               WhatsApp Sales & Automations
             </p>
           </div>
-          <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-500 border border-emerald-500/20">
+          <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 border border-emerald-500/20">
             WhatsApp API
           </span>
         </div>
 
         <div className="my-auto mx-auto w-full max-w-sm">
           {/* Header */}
-          <div className="mb-6">
-            <div className="mb-4">
+          <div className="mb-8">
+            <div className="mb-5">
               <Image
                 src="/parbat-logo.png"
                 alt="Parbat Logo"
                 width={160}
                 height={34}
-                className="h-8 w-auto object-contain dark:hidden"
+                className="h-9 w-auto object-contain"
                 priority
               />
-              <Image
-                src="/parbat-logo-white.png"
-                alt="Parbat Logo"
-                width={160}
-                height={34}
-                className="h-8 w-auto object-contain hidden dark:block"
-                priority
-              />
-              <p className="text-xs font-semibold text-primary mt-1.5 tracking-wide">
+              <p className="text-xs font-semibold text-primary mt-1.5 tracking-wide uppercase">
                 WhatsApp Sales & Automations
               </p>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
               {inviteToken ? t("titleAccept") : t("titleWelcome")}
             </h1>
-            <p className="mt-1.5 text-sm text-muted-foreground">
+            <p className="mt-1.5 text-sm text-slate-500">
               {inviteToken ? t("descAccept") : t("descWelcome")}
             </p>
           </div>
@@ -280,13 +265,13 @@ function LoginPageInner() {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             {error && (
-              <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive animate-in fade-in-50">
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 animate-in fade-in-50">
                 {error}
               </div>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-semibold text-foreground">
+              <Label htmlFor="email" className="text-xs font-semibold text-slate-700">
                 {t("emailLabel")}
               </Label>
               <Input
@@ -296,18 +281,18 @@ function LoginPageInner() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-11 rounded-xl border-border bg-muted/40 px-3.5 text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 transition-all"
+                className="h-11 rounded-xl border-slate-200 bg-slate-50/70 px-3.5 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-xs font-semibold text-foreground">
+                <Label htmlFor="password" className="text-xs font-semibold text-slate-700">
                   {t("passwordLabel")}
                 </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-medium text-primary hover:text-primary-hover hover:underline transition-colors"
+                  className="text-xs font-semibold text-primary hover:text-primary-hover hover:underline transition-colors"
                 >
                   {t("forgotPassword")}
                 </Link>
@@ -320,12 +305,12 @@ function LoginPageInner() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11 rounded-xl border-border bg-muted/40 pl-3.5 pr-10 text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 transition-all"
+                  className="h-11 rounded-xl border-slate-200 bg-slate-50/70 pl-3.5 pr-10 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 focus:outline-none transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -340,7 +325,7 @@ function LoginPageInner() {
             <Button
               type="submit"
               disabled={loading}
-              className="mt-3 h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/25 hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/30 active:scale-[0.99] disabled:opacity-50 transition-all cursor-pointer"
+              className="mt-3 h-11 w-full rounded-xl bg-primary text-sm font-semibold text-white shadow-lg shadow-primary/25 hover:bg-primary-hover hover:shadow-xl hover:shadow-primary/30 active:scale-[0.99] disabled:opacity-50 transition-all cursor-pointer"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -357,7 +342,7 @@ function LoginPageInner() {
           </form>
 
           {/* Sign up link */}
-          <div className="mt-6 text-center text-xs text-muted-foreground">
+          <div className="mt-6 text-center text-xs text-slate-500">
             <span>{t("noAccount")} </span>
             <Link
               href={
@@ -373,7 +358,7 @@ function LoginPageInner() {
         </div>
 
         {/* Security reassurance footer */}
-        <div className="mt-8 flex items-center justify-center gap-1.5 border-t border-border/50 pt-4 text-[11px] text-muted-foreground/80">
+        <div className="mt-8 flex items-center justify-center gap-1.5 border-t border-slate-100 pt-4 text-[11px] text-slate-400">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
           <span>Secured with Supabase Auth • Indian Cloud Infrastructure</span>
         </div>
