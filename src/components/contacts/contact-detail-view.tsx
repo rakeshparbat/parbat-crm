@@ -39,6 +39,9 @@ import {
   X,
   DollarSign,
   LayoutTemplate,
+  Compass,
+  ExternalLink,
+  Share2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { contactHandle } from '@/lib/whatsapp/wa-identity';
@@ -76,6 +79,12 @@ export function ContactDetailView({
   const [editPhone, setEditPhone] = useState('');
   const [editEmail, setEditEmail] = useState('');
   const [editCompany, setEditCompany] = useState('');
+  const [editUtmSource, setEditUtmSource] = useState('');
+  const [editUtmMedium, setEditUtmMedium] = useState('');
+  const [editUtmCampaign, setEditUtmCampaign] = useState('');
+  const [editUtmTerm, setEditUtmTerm] = useState('');
+  const [editUtmContent, setEditUtmContent] = useState('');
+  const [editLandingPage, setEditLandingPage] = useState('');
   const [savingDetails, setSavingDetails] = useState(false);
 
   // Tags tab
@@ -115,6 +124,12 @@ export function ContactDetailView({
       setEditPhone(data.phone);
       setEditEmail(data.email ?? '');
       setEditCompany(data.company ?? '');
+      setEditUtmSource(data.utm_source ?? '');
+      setEditUtmMedium(data.utm_medium ?? '');
+      setEditUtmCampaign(data.utm_campaign ?? '');
+      setEditUtmTerm(data.utm_term ?? '');
+      setEditUtmContent(data.utm_content ?? '');
+      setEditLandingPage(data.landing_page_url ?? '');
     }
     setLoading(false);
   }, [contactId, supabase]);
@@ -223,6 +238,12 @@ export function ContactDetailView({
         phone: editPhone.trim(),
         email: editEmail.trim() || null,
         company: editCompany.trim() || null,
+        utm_source: editUtmSource.trim() || null,
+        utm_medium: editUtmMedium.trim() || null,
+        utm_campaign: editUtmCampaign.trim() || null,
+        utm_term: editUtmTerm.trim() || null,
+        utm_content: editUtmContent.trim() || null,
+        landing_page_url: editLandingPage.trim() || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', contactId);
@@ -538,6 +559,85 @@ export function ContactDetailView({
                       className="bg-muted border-border text-foreground h-8 text-sm"
                     />
                   </div>
+
+                  {/* Campaign & Marketing Attribution (UTM) Card */}
+                  <div className="mt-4 pt-3 border-t border-border/60 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                        <Compass className="size-3.5 text-primary" />
+                        Campaign & Marketing (UTM)
+                      </div>
+                      {contact?.lead_source && (
+                        <Badge variant="outline" className="text-[10px] capitalize bg-primary/10 text-primary border-primary/20">
+                          {contact.lead_source}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-muted-foreground text-[11px]">Campaign (utm_campaign)</Label>
+                      <Input
+                        value={editUtmCampaign}
+                        onChange={(e) => setEditUtmCampaign(e.target.value)}
+                        placeholder="e.g. spring_sale_2026"
+                        className="bg-muted border-border text-foreground h-8 text-xs font-mono"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1.5">
+                        <Label className="text-muted-foreground text-[11px]">Source (utm_source)</Label>
+                        <Input
+                          value={editUtmSource}
+                          onChange={(e) => setEditUtmSource(e.target.value)}
+                          placeholder="e.g. facebook, google"
+                          className="bg-muted border-border text-foreground h-8 text-xs font-mono"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-muted-foreground text-[11px]">Medium (utm_medium)</Label>
+                        <Input
+                          value={editUtmMedium}
+                          onChange={(e) => setEditUtmMedium(e.target.value)}
+                          placeholder="e.g. cpc, bio, story"
+                          className="bg-muted border-border text-foreground h-8 text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-muted-foreground text-[11px]">Ad / Content (utm_content)</Label>
+                      <Input
+                        value={editUtmContent}
+                        onChange={(e) => setEditUtmContent(e.target.value)}
+                        placeholder="e.g. video_v1, banner_blue"
+                        className="bg-muted border-border text-foreground h-8 text-xs font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-muted-foreground text-[11px]">Landing Page / Form URL</Label>
+                        {editLandingPage && (
+                          <a
+                            href={editLandingPage.startsWith('http') ? editLandingPage : `https://${editLandingPage}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-primary hover:underline flex items-center gap-0.5"
+                          >
+                            Open <ExternalLink className="size-2.5" />
+                          </a>
+                        )}
+                      </div>
+                      <Input
+                        value={editLandingPage}
+                        onChange={(e) => setEditLandingPage(e.target.value)}
+                        placeholder="https://..."
+                        className="bg-muted border-border text-foreground h-8 text-xs font-mono truncate"
+                      />
+                    </div>
+                  </div>
+
                   <Button
                     onClick={saveDetails}
                     disabled={savingDetails}

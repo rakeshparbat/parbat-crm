@@ -91,6 +91,34 @@ function SignupPageInner() {
     setLoading(false);
   };
 
+  // If there is no invite token, open self-registration is closed!
+  if (!inviteToken) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <Card className="w-full max-w-md border-border bg-card">
+          <CardHeader className="items-center text-center">
+            <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+              <UsersRound className="h-6 w-6" />
+            </div>
+            <CardTitle className="text-xl text-foreground">
+              Registration by Invitation Only
+            </CardTitle>
+            <CardDescription className="text-muted-foreground mt-2 text-sm leading-relaxed">
+              Public self-registration is closed. If your organization has an account, please ask your administrator to send you an invitation link, or sign in below.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Link href="/login" className="w-full block">
+              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                Sign In to Your Account
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">

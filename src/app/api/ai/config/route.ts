@@ -9,6 +9,7 @@ import { encrypt, decrypt } from '@/lib/whatsapp/encryption'
 import { validateAiCredentials } from '@/lib/ai/validate'
 import { embedTexts } from '@/lib/ai/embeddings'
 import { AiError, type AiProvider } from '@/lib/ai/types'
+import { verifySuperAdmin } from '@/lib/auth/super-admin'
 
 function bad(message: string) {
   return NextResponse.json({ error: message }, { status: 400 })
@@ -47,10 +48,18 @@ export async function GET() {
     // The keys are selected only to derive the has_* flags; neither is
     // returned to the client.
     const { api_key, embeddings_api_key, ...safe } = data
+
+    // Redact proprietary prompt for non-super-admins
+    const superAdmin = await verifySuperAdmin()
+    if (!superAdmin && safe.system_prompt) {
+      safe.system_prompt = 'Managed AI Assistant prompt configured by platform administrator.'
+    }
+
     return NextResponse.json({
       configured: true,
       has_key: !!api_key,
       has_embeddings_key: !!embeddings_api_key,
+      is_managed: true,
       ...safe,
     })
   } catch (err) {
@@ -69,6 +78,14 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
+    const superAdmin = await verifySuperAdmin()
+    if (!superAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden: AI Agent configuration is managed exclusively by the platform administrator.' },
+        { status: 403 }
+      )
+    }
+
     const { supabase, accountId, userId } = await requireRole('admin')
 
     const limit = checkRateLimit(`ai-config:${userId}`, RATE_LIMITS.adminAction)
@@ -257,6 +274,14 @@ export async function POST(request: Request) {
  */
 export async function DELETE() {
   try {
+    const superAdmin = await verifySuperAdmin()
+    if (!superAdmin) {
+      return NextResponse.json(
+        { error: 'Forbidden: AI Agent configuration is managed exclusively by the platform administrator.' },
+        { status: 403 }
+      )
+    }
+
     const { supabase, accountId } = await requireRole('admin')
     const { error } = await supabase
       .from('ai_configs')

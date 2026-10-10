@@ -15,12 +15,13 @@
 // changes a one-file diff.
 // ============================================================
 
-export type AccountRole = "owner" | "admin" | "agent" | "viewer";
+export type AccountRole = "owner" | "admin" | "manager" | "agent" | "viewer";
 
 /** Ordered list of every valid role, lowest privilege first. */
 export const ACCOUNT_ROLES: readonly AccountRole[] = [
   "viewer",
   "agent",
+  "manager",
   "admin",
   "owner",
 ] as const;
@@ -32,8 +33,10 @@ export const ACCOUNT_ROLES: readonly AccountRole[] = [
 export function roleRank(role: AccountRole): number {
   switch (role) {
     case "owner":
-      return 4;
+      return 5;
     case "admin":
+      return 4;
+    case "manager":
       return 3;
     case "agent":
       return 2;
@@ -106,4 +109,14 @@ export function canDeleteAccount(role: AccountRole): boolean {
 /** Owner only: hand the account to another member. */
 export function canTransferOwnership(role: AccountRole): boolean {
   return role === "owner";
+}
+
+/** Owner / admin: view all company-wide contacts, analytics, and sales data. */
+export function canViewAllAccountData(role: AccountRole): boolean {
+  return hasMinRole(role, "admin");
+}
+
+/** Owner / admin / manager: manage team leads and view assigned agents. */
+export function canManageTeam(role: AccountRole): boolean {
+  return hasMinRole(role, "manager");
 }

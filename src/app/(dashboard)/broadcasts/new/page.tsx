@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -24,8 +24,15 @@ const steps = [
 export default function NewBroadcastPage() {
   const router = useRouter();
   const t = useTranslations('Broadcasts.new');
-  const { accountId } = useAuth();
+  const { accountId, isBroadcastsEnabled, profileLoading } = useAuth();
   const { createAndSendBroadcast, isProcessing, progress } = useBroadcastSending();
+
+  useEffect(() => {
+    if (!profileLoading && !isBroadcastsEnabled) {
+      toast.error('WhatsApp campaign broadcasts are locked for this account');
+      router.replace('/broadcasts');
+    }
+  }, [profileLoading, isBroadcastsEnabled, router]);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [template, setTemplate] = useState<MessageTemplate | null>(null);

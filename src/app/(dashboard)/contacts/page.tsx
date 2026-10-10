@@ -49,6 +49,7 @@ import {
   SlidersHorizontal,
   Filter,
   X,
+  Compass,
 } from 'lucide-react';
 import { ContactForm } from '@/components/contacts/contact-form';
 import { ContactDetailView } from '@/components/contacts/contact-detail-view';
@@ -601,7 +602,22 @@ export default function ContactsPage() {
                     />
                   </TableCell>
                   <TableCell className="text-foreground font-medium">
-                    {contact.name || <span className="text-muted-foreground italic">{t('unnamed')}</span>}
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span>{contact.name || <span className="text-muted-foreground italic">{t('unnamed')}</span>}</span>
+                        {contact.utm_campaign && (
+                          <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.2 text-[10px] font-mono text-primary border border-primary/20">
+                            <Compass className="size-2.5" />
+                            {contact.utm_campaign}
+                          </span>
+                        )}
+                        {contact.lead_source && !contact.utm_campaign && (
+                          <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.2 text-[9px] uppercase font-medium text-muted-foreground border border-border">
+                            {contact.lead_source}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground font-mono text-xs">
                     {contact.phone}

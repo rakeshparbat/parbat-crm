@@ -26,6 +26,12 @@ export interface LeadInput {
   note?: string | null
   /** Additional tags beyond the auto-applied source tag. */
   extraTags?: string[]
+  utm_source?: string | null
+  utm_medium?: string | null
+  utm_campaign?: string | null
+  utm_term?: string | null
+  utm_content?: string | null
+  landing_page_url?: string | null
 }
 
 export interface IngestResult {
@@ -64,17 +70,27 @@ export async function ingestLead(
     }
   )
 
-  // Stamp lead_source on newly-created contacts. For existing contacts
-  // we do not overwrite an existing source, but populate if null.
+  const utmPayload: Record<string, string | null> = {
+    lead_source: source,
+  }
+  if (input.utm_source) utmPayload.utm_source = input.utm_source
+  if (input.utm_medium) utmPayload.utm_medium = input.utm_medium
+  if (input.utm_campaign) utmPayload.utm_campaign = input.utm_campaign
+  if (input.utm_term) utmPayload.utm_term = input.utm_term
+  if (input.utm_content) utmPayload.utm_content = input.utm_content
+  if (input.landing_page_url) utmPayload.landing_page_url = input.landing_page_url
+
+  // Stamp lead_source and UTM parameters on contact
   if (created) {
     await db
       .from('contacts')
-      .update({ lead_source: source })
+      .update(utmPayload)
       .eq('id', contactId)
   } else {
+    // If existing, fill in any missing fields
     await db
       .from('contacts')
-      .update({ lead_source: source })
+      .update(utmPayload)
       .eq('id', contactId)
       .is('lead_source', null)
   }

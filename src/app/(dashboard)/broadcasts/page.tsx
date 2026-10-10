@@ -13,8 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Radio, Plus, Loader2 } from 'lucide-react';
+import { Radio, Plus, Loader2, Lock } from 'lucide-react';
 import { useCan } from '@/hooks/use-can';
+import { useAuth } from '@/hooks/use-auth';
 import { GatedButton } from '@/components/ui/gated-button';
 import { getBroadcastStatus } from '@/lib/broadcast-status';
 import { useTranslations } from 'next-intl';
@@ -61,7 +62,9 @@ export default function BroadcastsPage() {
   const router = useRouter();
   const t = useTranslations('Broadcasts.page');
   const tStatus = useTranslations('Broadcasts.status');
-  const canCreate = useCan('send-messages');
+  const { isBroadcastsEnabled } = useAuth();
+  const canSend = useCan('send-messages');
+  const canCreate = canSend && isBroadcastsEnabled;
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -152,6 +155,20 @@ export default function BroadcastsPage() {
 
   return (
     <div className="space-y-6">
+      {!isBroadcastsEnabled && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 flex items-center justify-between gap-3 text-amber-300">
+          <div className="flex items-center gap-3">
+            <Lock className="size-5 shrink-0 text-amber-400" />
+            <div>
+              <p className="text-sm font-semibold text-amber-300">WhatsApp Campaign Broadcasts Locked</p>
+              <p className="text-xs text-amber-200/80">
+                Campaign broadcast features are an exclusive module. Contact your Antigravity platform administrator to activate campaign privileges for your account.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top indeterminate progress bar: only visible while a broadcast
           is mid-send. Pure CSS animation so no extra deps. */}
       {anySending && (
@@ -189,7 +206,7 @@ export default function BroadcastsPage() {
         </div>
         <GatedButton
           canAct={canCreate}
-          gateReason="create broadcasts"
+          gateReason={!isBroadcastsEnabled ? "activate broadcast privileges by administrator" : "create broadcasts"}
           onClick={() => router.push('/broadcasts/new')}
           className="bg-primary text-primary-foreground hover:bg-primary/90"
         >

@@ -24,8 +24,9 @@ import {
   Users,
   UsersRound,
   Workflow,
-  X,
   Zap,
+  BarChart3,
+  X,
 } from "lucide-react";
 import type { AccountRole } from "@/lib/auth/roles";
 
@@ -50,6 +51,12 @@ const ROLE_CHIP: Record<
     // Primary-tinted: significant but not as scarce as owner.
     className:
       "border-primary/40 bg-primary/10 text-primary",
+  },
+  manager: {
+    icon: UsersRound,
+    labelKey: "roleManager",
+    className:
+      "border-blue-500/40 bg-blue-500/10 text-blue-400",
   },
   agent: {
     icon: UserCog,
@@ -96,6 +103,7 @@ const navItems: NavItem[] = [
   { href: "/notifications", labelKey: "notifications", icon: Bell },
   { href: "/contacts", labelKey: "contacts", icon: Users },
   { href: "/pipelines", labelKey: "pipelines", icon: GitBranch },
+  { href: "/reports", labelKey: "reports", icon: BarChart3 },
   { href: "/broadcasts", labelKey: "broadcasts", icon: Radio },
   { href: "/automations", labelKey: "automations", icon: Zap },
   { href: "/flows", labelKey: "flows", icon: Workflow, beta: true },
@@ -117,7 +125,7 @@ import { useTranslations } from "next-intl";
 export function Sidebar({ open = false, onClose }: SidebarProps) {
   const t = useTranslations("Sidebar");
   const pathname = usePathname();
-  const { profile, profileLoading, account, accountRole, signOut } = useAuth();
+  const { profile, profileLoading, account, accountRole, signOut, isSuperAdmin, isAiEnabled } = useAuth();
   const totalUnread = useTotalUnread();
   const unreadNotifications = useUnreadNotifications();
   // Only surface the account-name strip when it actually carries
@@ -219,7 +227,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
         {/* Main navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <ul className="flex flex-col gap-1">
-            {navItems.map((item) => {
+            {navItems.filter((item) => item.href !== "/agents" || isAiEnabled).map((item) => {
               const isActive =
                 pathname === item.href ||
                 (item.href !== "/dashboard" && pathname.startsWith(item.href));
@@ -395,6 +403,23 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
                 <Settings className="size-4" />
                 {t("menuSettings")}
               </DropdownMenuItem>
+              {isSuperAdmin && (
+                <>
+                  <DropdownMenuSeparator className="bg-border" />
+                  <DropdownMenuItem
+                    render={
+                      <Link
+                        href="/super-admin"
+                        onClick={onClose}
+                        className="text-amber-400 focus:bg-amber-500/10 focus:text-amber-300 font-medium"
+                      />
+                    }
+                  >
+                    <Crown className="size-4 text-amber-400" />
+                    Super Admin Center
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem
                 onClick={signOut}

@@ -246,6 +246,9 @@ async function processMetaLeadEvent(body: {
         leadgen_id?: string
         page_id?: string
         form_id?: string
+        campaign_id?: string
+        adgroup_id?: string
+        ad_id?: string
         created_time?: number
       }
     }>
@@ -325,6 +328,11 @@ async function processMetaLeadEvent(body: {
           company,
           note,
           extraTags: [formTag],
+          utm_source: 'meta',
+          utm_medium: 'paid_social',
+          utm_campaign: change.value.campaign_id ? `campaign-${change.value.campaign_id}` : (change.value.form_id ? `form-${change.value.form_id}` : undefined),
+          utm_term: change.value.adgroup_id ? `adset-${change.value.adgroup_id}` : undefined,
+          utm_content: change.value.ad_id ? `ad-${change.value.ad_id}` : undefined,
         })
 
         console.info(

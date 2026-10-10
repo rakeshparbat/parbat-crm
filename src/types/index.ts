@@ -45,6 +45,7 @@ export interface Profile {
    * `@/lib/auth/roles` rather than comparing this string directly.
    */
   account_role?: AccountRole;
+  is_super_admin?: boolean;
   created_at: string;
 }
 
@@ -57,6 +58,11 @@ export interface Account {
   name: string;
   /** auth.users.id of the immutable owner. */
   owner_user_id: string;
+  is_active?: boolean;
+  suspension_reason?: string | null;
+  ai_enabled?: boolean;
+  broadcasts_enabled?: boolean;
+  ai_monthly_quota?: number;
   created_at: string;
   updated_at: string;
 }
@@ -120,11 +126,44 @@ export interface Contact {
   company?: string;
   avatar_url?: string;
   lead_source?: 'meta' | 'google' | 'website' | 'whatsapp' | 'csv' | 'manual' | string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  landing_page_url?: string | null;
   created_at: string;
   updated_at: string;
   /** Hydrated by queries that embed `contact_tags(tags(*))` (e.g. the
    *  Inbox conversation list, for tag filtering). Absent otherwise. */
   tags?: Tag[];
+}
+
+export interface Team {
+  id: string;
+  account_id: string;
+  name: string;
+  manager_user_id: string | null;
+  manager?: {
+    id: string;
+    full_name: string;
+    email: string;
+  };
+  members_count?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TeamMember {
+  id: string;
+  team_id: string;
+  user_id: string;
+  user?: {
+    id: string;
+    full_name: string;
+    email: string;
+  };
+  created_at: string;
 }
 
 export interface Tag {

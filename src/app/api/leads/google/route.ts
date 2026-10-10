@@ -158,6 +158,11 @@ async function processGoogleLead(
     company,
     note: message ?? undefined,
     extraTags,
+    utm_source: 'google',
+    utm_medium: 'cpc',
+    utm_campaign: payload.campaign_id ? `google-${payload.campaign_id}` : undefined,
+    utm_term: payload.adgroup_id ? `adgroup-${payload.adgroup_id}` : undefined,
+    utm_content: payload.creative_id ? `ad-${payload.creative_id}` : undefined,
   })
 
   console.info(

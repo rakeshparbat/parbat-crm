@@ -76,13 +76,28 @@ export async function POST(request: Request) {
     const message = typeof body.message === 'string' ? body.message.trim() : null
     const sourceUrl = typeof body.source_url === 'string' ? body.source_url.trim() : null
 
+    // Extract UTM parameters directly from body or parse from source_url
+    let utmSource = typeof body.utm_source === 'string' ? body.utm_source.trim() : null
+    let utmMedium = typeof body.utm_medium === 'string' ? body.utm_medium.trim() : null
+    let utmCampaign = typeof body.utm_campaign === 'string' ? body.utm_campaign.trim() : null
+    let utmTerm = typeof body.utm_term === 'string' ? body.utm_term.trim() : null
+    let utmContent = typeof body.utm_content === 'string' ? body.utm_content.trim() : null
+
     // Build extra tags from context metadata so agents can see the
     // originating URL without opening a separate analytics tool.
     const extraTags: string[] = []
     if (sourceUrl) {
       try {
-        const hostname = new URL(sourceUrl).hostname.replace(/^www\./, '')
+        const parsedUrl = new URL(sourceUrl)
+        const hostname = parsedUrl.hostname.replace(/^www\./, '')
         extraTags.push(`site-${hostname}`)
+
+        // If UTM parameters weren't explicitly supplied, extract from query string
+        if (!utmSource && parsedUrl.searchParams.get('utm_source')) utmSource = parsedUrl.searchParams.get('utm_source')
+        if (!utmMedium && parsedUrl.searchParams.get('utm_medium')) utmMedium = parsedUrl.searchParams.get('utm_medium')
+        if (!utmCampaign && parsedUrl.searchParams.get('utm_campaign')) utmCampaign = parsedUrl.searchParams.get('utm_campaign')
+        if (!utmTerm && parsedUrl.searchParams.get('utm_term')) utmTerm = parsedUrl.searchParams.get('utm_term')
+        if (!utmContent && parsedUrl.searchParams.get('utm_content')) utmContent = parsedUrl.searchParams.get('utm_content')
       } catch {
         // Malformed URL — just skip the tag.
       }
@@ -95,6 +110,12 @@ export async function POST(request: Request) {
       company,
       note: message ?? undefined,
       extraTags,
+      utm_source: utmSource ?? 'website',
+      utm_medium: utmMedium,
+      utm_campaign: utmCampaign,
+      utm_term: utmTerm,
+      utm_content: utmContent,
+      landing_page_url: sourceUrl,
     })
 
     return NextResponse.json(

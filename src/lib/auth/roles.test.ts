@@ -14,18 +14,19 @@ import {
 } from "./roles";
 
 describe("roleRank", () => {
-  it("orders owner > admin > agent > viewer", () => {
+  it("orders owner > admin > manager > agent > viewer", () => {
     expect(roleRank("owner")).toBeGreaterThan(roleRank("admin"));
-    expect(roleRank("admin")).toBeGreaterThan(roleRank("agent"));
+    expect(roleRank("admin")).toBeGreaterThan(roleRank("manager"));
+    expect(roleRank("manager")).toBeGreaterThan(roleRank("agent"));
     expect(roleRank("agent")).toBeGreaterThan(roleRank("viewer"));
   });
 
   it("matches the SQL helper's numeric mapping", () => {
     // Keep these in lockstep with `is_account_member`'s CASE expression
-    // in supabase/migrations/017_account_sharing.sql — any change here
-    // means the SQL helper needs the same change.
-    expect(roleRank("owner")).toBe(4);
-    expect(roleRank("admin")).toBe(3);
+    // in supabase/migrations/044_saas_multi_tier_and_super_admin.sql
+    expect(roleRank("owner")).toBe(5);
+    expect(roleRank("admin")).toBe(4);
+    expect(roleRank("manager")).toBe(3);
     expect(roleRank("agent")).toBe(2);
     expect(roleRank("viewer")).toBe(1);
   });

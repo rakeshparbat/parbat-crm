@@ -509,51 +509,84 @@ function WebsiteLeadSection({ accountId, canEdit }: { accountId: string; canEdit
     : '/api/leads/website';
 
   const generateSnippet = (key: string) => {
-    return `<!-- WA CRM Website Lead Form -->
+    return `<!-- Universal Website Lead Form & UTM Tracker -->
 <script>
 (function() {
   const WACRM_API = '${webhookUrl}';
   const WACRM_KEY = '${key}';
 
-  // Minimal fetch helper — call this from your own form submit handler
+  // Helper to extract UTM parameters from current URL
+  function getUtmParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      utm_source: params.get('utm_source') || 'website',
+      utm_medium: params.get('utm_medium') || '',
+      utm_campaign: params.get('utm_campaign') || '',
+      utm_term: params.get('utm_term') || '',
+      utm_content: params.get('utm_content') || '',
+      landing_page_url: window.location.href,
+    };
+  }
+
+  // Universal submit function — can be called manually or by form listener
   window.wacrmSubmitLead = function(data) {
+    const payload = Object.assign({}, getUtmParams(), data, {
+      source_url: window.location.href
+    });
+
     return fetch(WACRM_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + WACRM_KEY,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     }).then(function(r) { return r.json(); });
   };
 
-  // Auto-attach to a <form id="wacrm-lead-form"> if it exists
+  // Auto-bind to ALL forms with attribute data-wacrm-form OR id/class wacrm-lead-form
   document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('wacrm-lead-form');
-    if (!form) return;
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      var fd = new FormData(form);
-      window.wacrmSubmitLead({
-        phone:   fd.get('phone'),
-        name:    fd.get('name'),
-        email:   fd.get('email'),
-        message: fd.get('message'),
-        source_url: window.location.href,
-      }).then(function(r) {
-        if (r.contact_id) alert('Thank you! We will be in touch.');
+    const forms = document.querySelectorAll('form[data-wacrm-form], #wacrm-lead-form, .wacrm-lead-form');
+    forms.forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const formTag = form.getAttribute('data-wacrm-form') || 'web-form';
+
+        window.wacrmSubmitLead({
+          phone: fd.get('phone') || fd.get('tel') || fd.get('mobile'),
+          name: fd.get('name') || fd.get('full_name'),
+          email: fd.get('email'),
+          company: fd.get('company'),
+          message: fd.get('message') || fd.get('comment') || fd.get('note'),
+          extraTags: [formTag],
+        }).then(function(r) {
+          if (r && r.contact_id) {
+            const redirect = form.getAttribute('data-wacrm-redirect');
+            if (redirect) {
+              window.location.href = redirect;
+            } else {
+              alert('Thank you! Your inquiry has been received.');
+              form.reset();
+            }
+          }
+        }).catch(function(err) {
+          console.error('[CRM Lead Error]', err);
+        });
       });
     });
   });
 })();
 </script>
-<!-- Add this HTML to your page -->
-<form id="wacrm-lead-form">
-  <input name="name"    placeholder="Your name"   type="text"  required />
-  <input name="phone"   placeholder="+1 555 0100"  type="tel"   required />
-  <input name="email"   placeholder="your@email.com" type="email" />
-  <textarea name="message" placeholder="Your message"></textarea>
-  <button type="submit">Send</button>
+
+<!-- Example: Works on multiple forms anywhere on your website -->
+<!-- Form 1: Contact Us -->
+<form data-wacrm-form="contact-page" data-wacrm-redirect="/thank-you">
+  <input name="name" placeholder="Full Name" type="text" required />
+  <input name="phone" placeholder="+1234567890" type="tel" required />
+  <input name="email" placeholder="Email" type="email" />
+  <textarea name="message" placeholder="Message"></textarea>
+  <button type="submit">Submit Inquiry</button>
 </form>`;
   };
 

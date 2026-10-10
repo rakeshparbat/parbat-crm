@@ -35,6 +35,7 @@ interface Profile {
   beta_features: string[];
   account_id: string | null;
   account_role: AccountRole | null;
+  is_super_admin?: boolean;
 }
 
 interface AccountSummary {
@@ -43,6 +44,9 @@ interface AccountSummary {
   /** Default deal currency (ISO-4217). NOT NULL DEFAULT 'USD' in the
    *  DB (migration 021); narrowed to DEFAULT_CURRENCY when absent. */
   default_currency: string;
+  is_active?: boolean;
+  ai_enabled?: boolean;
+  broadcasts_enabled?: boolean;
 }
 
 /**
@@ -120,10 +124,18 @@ interface AuthContextValue {
   isOwner: boolean;
   /** True if `accountRole === 'admin'` (does NOT include owner — use canManageMembers for "admin or above"). */
   isAdmin: boolean;
+  /** True if `accountRole === 'manager'`. */
+  isManager: boolean;
   /** True if `accountRole === 'agent'`. */
   isAgent: boolean;
   /** True if `accountRole === 'viewer'`. */
   isViewer: boolean;
+  /** True if user has platform super admin privileges. */
+  isSuperAdmin: boolean;
+  /** True if AI assistant features are enabled for this account. */
+  isAiEnabled: boolean;
+  /** True if WhatsApp campaign broadcasts are enabled for this account. */
+  isBroadcastsEnabled: boolean;
   /** True if the caller can manage members (admin+). */
   canManageMembers: boolean;
   /** True if the caller can edit account-wide settings (admin+). */
@@ -152,6 +164,7 @@ interface ProfileRow {
   beta_features: string[] | null;
   account_id: string | null;
   account_role: string | null;
+  is_super_admin: boolean | null;
 }
 
 /**
@@ -192,7 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const result = await supabase
           .from("profiles")
           .select(
-            "id, full_name, email, avatar_url, role, beta_features, account_id, account_role",
+            "id, full_name, email, avatar_url, role, beta_features, account_id, account_role, is_super_admin",
           )
           .eq("user_id", userId)
           .maybeSingle();
@@ -239,7 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .from("accounts")
             // default_currency added in migration 021; narrowed to the
             // USD fallback below for older schemas where it reads null.
-            .select("id, name, default_currency")
+            .select("id, name, default_currency, is_active, ai_enabled, broadcasts_enabled")
             .eq("id", data.account_id)
             .maybeSingle();
           if (accountErr) {
@@ -254,6 +267,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               id: account.id,
               name: account.name,
               default_currency: account.default_currency ?? DEFAULT_CURRENCY,
+              is_active: account.is_active ?? true,
+              ai_enabled: account.ai_enabled ?? false,
+              broadcasts_enabled: account.broadcasts_enabled ?? false,
             };
           }
         }
@@ -280,6 +296,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           beta_features: data.beta_features ?? [],
           account_id: data.account_id ?? null,
           account_role: accountRole,
+          is_super_admin: Boolean(data.is_super_admin),
         });
         setAccount(accountRow);
         if (!data.account_id || !accountRole) {
@@ -405,13 +422,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       accountId: profile?.account_id ?? null,
       isOwner: role === "owner",
       isAdmin: role === "admin",
+      isManager: role === "manager",
       isAgent: role === "agent",
       isViewer: role === "viewer",
+      isSuperAdmin: Boolean(profile?.is_super_admin),
+      isAiEnabled: Boolean(account?.ai_enabled || profile?.is_super_admin),
+      isBroadcastsEnabled: Boolean(account?.broadcasts_enabled || profile?.is_super_admin),
       canManageMembers: role ? canManageMembersFor(role) : false,
       canEditSettings: role ? canEditSettingsFor(role) : false,
       canSendMessages: role ? canSendMessagesFor(role) : false,
     };
-  }, [profile?.account_role, profile?.account_id]);
+  }, [profile?.account_role, profile?.account_id, profile?.is_super_admin, account?.ai_enabled, account?.broadcasts_enabled]);
 
   // Signed out is not a broken account — the shell redirects to /login
   // before anything reads this.
@@ -476,8 +497,12 @@ export function useAuth(): AuthContextValue {
       accountRole: null,
       isOwner: false,
       isAdmin: false,
+      isManager: false,
       isAgent: false,
       isViewer: false,
+      isSuperAdmin: false,
+      isAiEnabled: false,
+      isBroadcastsEnabled: false,
       canManageMembers: false,
       canEditSettings: false,
       canSendMessages: false,
