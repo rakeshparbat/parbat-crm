@@ -441,6 +441,11 @@ export function ContactDetailView({
                         {contact.company}
                       </span>
                     )}
+                    {contact.lead_source && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-medium capitalize bg-primary/5 text-primary border-primary/20">
+                        {contact.lead_source} lead
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>

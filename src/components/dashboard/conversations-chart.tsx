@@ -48,33 +48,57 @@ export function ConversationsChart({ series, loading, range, onRangeChange }: Co
     return { maxY: ceil, niceTicks: Array.from(new Set(ticks)) }
   }, [data])
 
+  // Compute totals for the KPI strip in the header
+  const totalIncoming = (series[range] ?? []).reduce((s, p) => s + p.incoming, 0)
+  const totalOutgoing = (series[range] ?? []).reduce((s, p) => s + p.outgoing, 0)
+
   return (
     <section className="flex h-full flex-col rounded-xl border border-border bg-card">
-      <header className="flex items-center justify-between border-b border-border px-5 py-4">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">{t('title')}</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">{t('description')}</p>
+      <header className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+        <div className="flex items-start gap-2">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10">
+            <MessageSquare className="h-3.5 w-3.5 text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">{t('title')}</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t('description')}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-1 rounded-lg bg-muted/60 p-1">
-          {[7, 30, 90].map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => onRangeChange(r as RangeDays)}
-              className={cn(
-                'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
-                range === r
-                  ? 'bg-secondary text-secondary-foreground'
-                  : 'text-muted-foreground hover:text-foreground',
-              )}
-            >
-              {t('days', { count: r })}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          {/* Mini KPI strip */}
+          {!loading && series[range] && (
+            <div className="hidden items-center gap-3 text-right text-xs sm:flex">
+              <span className="text-muted-foreground">
+                <span className="font-semibold tabular-nums text-blue-400">{totalIncoming.toLocaleString()}</span>
+                {' '}{t('incoming')}
+              </span>
+              <span className="text-muted-foreground">
+                <span className="font-semibold tabular-nums text-primary">{totalOutgoing.toLocaleString()}</span>
+                {' '}{t('outgoing')}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center gap-0.5 rounded-lg bg-muted/60 p-1">
+            {[7, 30, 90].map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => onRangeChange(r as RangeDays)}
+                className={cn(
+                  'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
+                  range === r
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {t('days', { count: r })}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
-      <div className="p-5">
+      <div className="flex-1 p-5">
         {loading || !data ? (
           <Skeleton className="h-[240px] w-full" />
         ) : data.every((p) => p.incoming === 0 && p.outgoing === 0) ? (
@@ -88,7 +112,7 @@ export function ConversationsChart({ series, loading, range, onRangeChange }: Co
         )}
       </div>
 
-      <footer className="flex items-center gap-4 border-t border-border px-5 py-3 text-xs text-muted-foreground">
+      <footer className="flex items-center gap-4 border-t border-border bg-muted/20 px-5 py-3 text-xs text-muted-foreground">
         <LegendDot color="#3b82f6" label={t('incoming')} />
         <LegendDot color="#7c3aed" label={t('outgoing')} />
       </footer>
@@ -243,12 +267,31 @@ function LineSvg({
           ) : null,
         )}
 
+        {/* Area fill under outgoing (violet) */}
+        <defs>
+          <linearGradient id="grad-outgoing" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="grad-incoming" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.14" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path
+          d={`${outgoingPath} L${xFor(data.length - 1)},${PADDING.top + chartH} L${xFor(0)},${PADDING.top + chartH} Z`}
+          fill="url(#grad-outgoing)"
+        />
+        <path
+          d={`${incomingPath} L${xFor(data.length - 1)},${PADDING.top + chartH} L${xFor(0)},${PADDING.top + chartH} Z`}
+          fill="url(#grad-incoming)"
+        />
         {/* Outgoing polyline (violet) */}
         <path
           d={outgoingPath}
           fill="none"
           stroke="#7c3aed"
-          strokeWidth={2}
+          strokeWidth={2.5}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -257,7 +300,7 @@ function LineSvg({
           d={incomingPath}
           fill="none"
           stroke="#3b82f6"
-          strokeWidth={2}
+          strokeWidth={2.5}
           strokeLinecap="round"
           strokeLinejoin="round"
         />

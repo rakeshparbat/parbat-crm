@@ -13,6 +13,17 @@ export interface MetricsBundle {
   openDealsValue: number
   openDealsCount: number
   messagesSentToday: MetricDelta
+  // ---- India-specific metrics ----
+  /** 0–100 percentage of customer messages that received a reply today. */
+  whatsappResponseRate: number
+  /** Total value of deals marked Won in the current calendar month (INR). */
+  dealsWonThisMonth: number
+  /** Count of deals closed Won this month. */
+  dealsWonThisMonthCount: number
+  /** Total WhatsApp recipients reached by broadcasts sent today. */
+  broadcastReachToday: number
+  /** Conversations where last customer message was 20–24h ago (window expiring). */
+  conversationsExpiringSoon: number
 }
 
 export interface ConversationsSeriesPoint {

@@ -1,6 +1,6 @@
 "use client"
 
-import { GitBranch } from 'lucide-react'
+import { GitBranch, TrendingUp } from 'lucide-react'
 import type { PipelineDonutData } from '@/lib/dashboard/types'
 import { formatCurrencyShort } from '@/lib/currency'
 import { EmptyState } from './empty-state'
@@ -20,10 +20,17 @@ export function PipelineDonut({ data, loading, currency }: PipelineDonutProps) {
   return (
     <section className="flex h-full flex-col rounded-xl border border-border bg-card">
       <header className="border-b border-border px-5 py-4">
-        <h2 className="text-sm font-semibold text-foreground">{t('title')}</h2>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          {t('description')}
-        </p>
+        <div className="flex items-start gap-2">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
+            <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">{t('title')}</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t('description')}
+            </p>
+          </div>
+        </div>
       </header>
 
       <div className="flex flex-1 flex-col p-5">
@@ -38,23 +45,35 @@ export function PipelineDonut({ data, loading, currency }: PipelineDonutProps) {
         ) : (
           <>
             <Donut data={data} currency={currency} />
-            <ul className="mt-5 space-y-2">
-              {data.stages.map((s) => (
-                <li key={s.id} className="flex items-center gap-3 text-xs">
-                  <span
-                    className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
-                    style={{ background: s.color }}
-                    aria-hidden
-                  />
-                  <span className="flex-1 truncate text-muted-foreground">{s.name}</span>
-                  <span className="text-muted-foreground tabular-nums">
-                    {t('dealCount', { count: s.dealCount })}
-                  </span>
-                  <span className="w-20 text-right text-muted-foreground tabular-nums">
-                    {formatCurrencyShort(s.totalValue, currency)}
-                  </span>
-                </li>
-              ))}
+            <ul className="mt-4 space-y-2.5">
+              {data.stages.map((s) => {
+                const pct = data.totalValue > 0 ? (s.totalValue / data.totalValue) * 100 : 0
+                return (
+                  <li key={s.id} className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span
+                        className="h-2 w-2 flex-shrink-0 rounded-full"
+                        style={{ background: s.color }}
+                        aria-hidden
+                      />
+                      <span className="flex-1 truncate text-muted-foreground">{s.name}</span>
+                      <span className="text-muted-foreground tabular-nums">
+                        {t('dealCount', { count: s.dealCount })}
+                      </span>
+                      <span className="w-16 text-right font-semibold text-foreground tabular-nums">
+                        {formatCurrencyShort(s.totalValue, currency)}
+                      </span>
+                    </div>
+                    {/* Mini progress bar per stage */}
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${pct}%`, background: s.color }}
+                      />
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           </>
         )}

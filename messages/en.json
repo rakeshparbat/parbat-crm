@@ -1678,7 +1678,8 @@
       "fields": "Fields & tags",
       "deals": "Deals & currency",
       "members": "Team members",
-      "api": "API keys"
+      "api": "API keys",
+      "lead-sources": "Lead sources"
     },
     "groups": {
       "account": "Account",

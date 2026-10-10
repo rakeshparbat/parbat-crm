@@ -1668,7 +1668,8 @@
       "fields": "Campos e tags",
       "deals": "Negócios e moeda",
       "members": "Membros da equipe",
-      "api": "Chaves de API"
+      "api": "Chaves de API",
+      "lead-sources": "Fontes de leads"
     },
     "groups": {
       "account": "Conta",

@@ -33,6 +33,15 @@ export async function loadMetrics(db: DB): Promise<MetricsBundle> {
   const todayStart = startOfLocalDay().toISOString()
   const yesterdayStart = daysAgoStart(1).toISOString()
 
+  // Start of current calendar month (for "deals won this month")
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+
+  // WhatsApp 24-hour window: conversations at risk are those where the
+  // last customer message was between 20h and 24h ago (expiring soon).
+  const twentyHoursAgo = new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString()
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
   const [
     openConvCur,
     newConvToday,
@@ -42,6 +51,12 @@ export async function loadMetrics(db: DB): Promise<MetricsBundle> {
     openDeals,
     messagesToday,
     messagesYesterday,
+    // India-specific
+    customerMsgsToday,
+    repliedConvsToday,
+    dealsWon,
+    broadcastsToday,
+    expiringMsgs,
   ] = await Promise.all([
     db.from('conversations').select('id', { count: 'exact', head: true }).eq('status', 'open'),
     db
@@ -73,17 +88,59 @@ export async function loadMetrics(db: DB): Promise<MetricsBundle> {
       .eq('sender_type', 'agent')
       .gte('created_at', yesterdayStart)
       .lt('created_at', todayStart),
+    // ── India metrics ──
+    // 1. How many distinct conversations had a customer message today?
+    db
+      .from('messages')
+      .select('conversation_id', { count: 'exact', head: true })
+      .eq('sender_type', 'customer')
+      .gte('created_at', todayStart),
+    // 2. Of those, how many got at least one agent reply today?
+    db
+      .from('messages')
+      .select('conversation_id', { count: 'exact', head: true })
+      .eq('sender_type', 'agent')
+      .gte('created_at', todayStart),
+    // 3. Deals won this calendar month
+    db
+      .from('deals')
+      .select('value')
+      .eq('status', 'won')
+      .gte('updated_at', monthStart),
+    // 4. Broadcast recipients reached today
+    db
+      .from('broadcasts')
+      .select('total_recipients')
+      .eq('status', 'sent')
+      .gte('created_at', todayStart),
+    // 5. Conversations expiring soon (20–24h since last customer message, still open)
+    db
+      .from('messages')
+      .select('conversation_id', { count: 'exact', head: true })
+      .eq('sender_type', 'customer')
+      .gte('created_at', twentyFourHoursAgo)
+      .lt('created_at', twentyHoursAgo),
   ])
 
   const openDealsRows = (openDeals.data ?? []) as { value: number | null }[]
   const openDealsValue = openDealsRows.reduce((sum, d) => sum + (d.value ?? 0), 0)
 
+  // Response rate: approximate as (agent messages today / customer messages today) × 100
+  // Capped at 100%. If no customer messages, show 100% (no unanswered queries).
+  const custMsgs = customerMsgsToday.count ?? 0
+  const agentMsgs = repliedConvsToday.count ?? 0
+  const whatsappResponseRate =
+    custMsgs === 0 ? 100 : Math.min(100, Math.round((agentMsgs / custMsgs) * 100))
+
+  const dealsWonRows = (dealsWon.data ?? []) as { value: number | null }[]
+  const dealsWonThisMonth = dealsWonRows.reduce((sum, d) => sum + (d.value ?? 0), 0)
+
+  const broadcastRows = (broadcastsToday.data ?? []) as { total_recipients: number | null }[]
+  const broadcastReachToday = broadcastRows.reduce((sum, b) => sum + (b.total_recipients ?? 0), 0)
+
   return {
     activeConversations: {
       current: openConvCur.count ?? 0,
-      // "vs yesterday" on a current-state count has no clean answer
-      // without snapshots — we show the delta in NEW open conversations
-      // today vs yesterday. That's the business-meaningful daily signal.
       previous: (newConvToday.count ?? 0) - (newConvYesterday.count ?? 0),
     },
     newContactsToday: {
@@ -96,6 +153,11 @@ export async function loadMetrics(db: DB): Promise<MetricsBundle> {
       current: messagesToday.count ?? 0,
       previous: messagesYesterday.count ?? 0,
     },
+    whatsappResponseRate,
+    dealsWonThisMonth,
+    dealsWonThisMonthCount: dealsWonRows.length,
+    broadcastReachToday,
+    conversationsExpiringSoon: expiringMsgs.count ?? 0,
   }
 }
 
